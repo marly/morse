@@ -1,12 +1,13 @@
-var character_order = "Q7ZG098O1JPWLRAM6BXDYCKN23FU45VHSITE";
 var grey_blue = "#4878A8";
 var sky_blue = "#A8D8F0";
 var orange = "#F07830";
 var rouge = "#781800";
 var grey_teal = "#487890";
-
 var graph_bar_colors = [grey_blue, sky_blue, orange, rouge];
+
+var character_order = "Q7ZG098O1JPWLRAM6BXDYCKN23FU45VHSITE";
 var morse_characters = new Array();
+var error_rate = 0;
 
 $(document).ready(function()  {
   initialize_character_arrays();
@@ -22,15 +23,35 @@ $(document).ready(function()  {
   $('body').keydown(function(event) {
     for (i in morse_characters) {
       if (morse_characters[i].ascii_code == event.which) {
-        morse_characters[current_letter_index].score(event.which);
+        var passed = morse_characters[current_letter_index].score(event.which);
+        error_rate = update_score(error_rate, passed);
+
+        /* Accelerate character decay rate if the error rate is low */
+        if (error_rate < 0.1)
+          morse_characters[current_letter_index].score(event.which);
+
+        /* Graduate if necessary and redraw */
+        graduate();
         redraw_graph(context);
-        current_letter_index = choose_letter();
-        $('#press_me>p').text(morse_characters[current_letter_index].character);
+
+
+        /* Only change the chosen letter if guessed correctly. */ 
+        if (passed) {
+          current_letter_index = choose_letter();
+          $('#press_me>p').text(morse_characters[current_letter_index].character);
+        }
+
+
         break;
       }
     }
   });
 });
+
+/* Update score */
+function update_score(current_score, passed) {
+  return 0.875*current_score + (passed ? 0 : 0.125)
+}
 
 /* Initialize a morse character object */
 function morse_character(character, level, visible) {
@@ -39,11 +60,11 @@ function morse_character(character, level, visible) {
   this.level = level;
   this.visible = visible;
   this.make_visible = function() { this.visible = true; };
+
   this.score = function(c) {
-    if (c == this.ascii_code)
-      this.level = 0.875* this.level;
-    else
-      this.level = 0.875*this.level + 0.125;
+    var passed = (c == this.ascii_code)
+    this.level = update_score(this.level, passed);
+    return passed;
   }
 }
 
@@ -60,7 +81,7 @@ function initialize_character_arrays() {
 
 /* Redraw the graph to show all visible characters */
 function redraw_graph(context) {
-  context.clearRect(0, 0, 800, 300);
+  context.clearRect(0, 0, 800, 350);
   for (i in morse_characters) {
     context.fillStyle = graph_bar_colors[i%4];
     if (morse_characters[i].visible) {
@@ -74,6 +95,7 @@ function redraw_graph(context) {
   }
 }
 
+/* Choose a letter weighted by knowledge of letter */
 function choose_letter() {
   var sum = 0.0;
 
@@ -92,5 +114,19 @@ function choose_letter() {
         return i;
      }
    
+  }
+}
+
+function graduate() {
+  if (error_rate > 0.3)
+    return;
+  else {
+    for (i in morse_characters) {
+      if (morse_characters[i].visible && morse_characters[i].level > 0.4) return;
+      else if (!morse_characters[i].visible) {
+        morse_characters[i].make_visible();
+        return;
+      }
+    }
   }
 }
