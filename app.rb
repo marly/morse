@@ -6,5 +6,5 @@ get '/morse_style.css' do
 end
 
 get '/morse' do
-  haml :morse, :layout => :morse_layout
+  haml :morse, {:layout => :morse_layout}
 end
