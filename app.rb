@@ -1,10 +1,10 @@
 require 'sinatra'
 require 'haml'
 
-get '/style.css' do
-  sass :style
+get '/morse_style.css' do
+  sass :morse_style
 end
 
-get '/' do
-  haml :index
+get '/morse' do
+  haml :morse, :layout => :morse_layout
 end
