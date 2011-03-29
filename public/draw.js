@@ -38,6 +38,7 @@ $(document).ready(function()  {
         /* Only change the chosen letter if guessed correctly. */ 
         if (passed) {
           current_letter_index = choose_letter();
+          $('audio').attr('src', morse_characters[current_letter_index].wav).attr('autoplay', true);
           $('#press_me>p').text(morse_characters[current_letter_index].character);
         }
 
@@ -59,6 +60,7 @@ function morse_character(character, level, visible) {
   this.ascii_code = character.charCodeAt(0);
   this.level = level;
   this.visible = visible;
+  this.wav = 'sounds/' + character + '.wav'
   this.make_visible = function() { this.visible = true; };
 
   this.score = function(c) {
