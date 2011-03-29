@@ -6,7 +6,7 @@ var grey_teal = "#487890";
 var graph_bar_colors = [grey_blue, sky_blue, orange, rouge];
 
 var character_order = "Q7ZG098O1JPWLRAM6BXDYCKN23FU45VHSITE";
-var morse_characters = new Array();
+var cw_chars = new Array();
 var error_rate = 0;
 
 $(document).ready(function()  {
@@ -14,32 +14,33 @@ $(document).ready(function()  {
 
   var example = document.getElementById("bargraph");
   var context = example.getContext('2d');
-  var current_letter_index = 0;
+  var letter_index = 0;
 
   redraw_graph(context);
  
-  $('#press_me>p').text(morse_characters[current_letter_index].character);
+  $('#press_me>p').text(cw_chars[letter_index].character);
 
   $('*').keydown(function(event) {
-    for (i in morse_characters) {
-      if (morse_characters[i].ascii_code == event.which) {
-        var passed = morse_characters[current_letter_index].score(event.which);
+    for (i in cw_chars) {
+      if (cw_chars[i].ascii_code == event.which) {
+        var passed = cw_chars[letter_index].score(event.which);
         error_rate = update_score(error_rate, passed);
 
         /* Accelerate character decay rate if the error rate is low */
         if (error_rate < 0.1)
-          morse_characters[current_letter_index].score(event.which);
+          cw_chars[letter_index].score(event.which);
 
         /* Graduate if necessary and redraw */
         graduate();
         redraw_graph(context);
 
-
         /* Only change the chosen letter if guessed correctly. */ 
         if (passed) {
-          current_letter_index = choose_letter();
-          $('audio').attr('src', morse_characters[current_letter_index].wav).attr('autoplay', true);
-          $('#press_me>p').text(morse_characters[current_letter_index].character);
+          letter_index = choose_letter();
+          $('audio').remove();
+          var a = '<audio src="' +  cw_chars[letter_index].wav + '" autoplay="true"></audio>';
+          $('body').append(a);
+          $('#press_me>p').text(cw_chars[letter_index].character);
         }
 
 
@@ -70,29 +71,29 @@ function morse_character(character, level, visible) {
   }
 }
 
-/* Initialze the morse_characters and ascii_characters arrays */
+/* Initialze the cw_chars and ascii_characters arrays */
 function initialize_character_arrays() {
   for (c in character_order) {
-    morse_characters.push(new morse_character(character_order[c], 1.0, false)); 
+    cw_chars.push(new morse_character(character_order[c], 1.0, false)); 
   }
 
   /* Make the first 3 characters visible. */
-  for (i=0;i<3;i=i+1) { morse_characters[i].make_visible(); }
+  for (i=0;i<3;i=i+1) { cw_chars[i].make_visible(); }
 }
 
 
 /* Redraw the graph to show all visible characters */
 function redraw_graph(context) {
   context.clearRect(0, 0, 800, 350);
-  for (i in morse_characters) {
+  for (i in cw_chars) {
     context.fillStyle = graph_bar_colors[i%4];
-    if (morse_characters[i].visible) {
-      var height = morse_characters[i].level*300;
-      var ybase = 300 - morse_characters[i].level*300;
+    if (cw_chars[i].visible) {
+      var height = cw_chars[i].level*300;
+      var ybase = 300 - cw_chars[i].level*300;
       context.fillRect(28*i + 20, ybase, 18, height);
       context.font = "bold 18px sans-serif";
       context.textBaseline = 'top';
-      context.fillText(morse_characters[i].character, 28*i+22, 305);
+      context.fillText(cw_chars[i].character, 28*i+22, 305);
     }
   }
 }
@@ -101,16 +102,16 @@ function redraw_graph(context) {
 function choose_letter() {
   var sum = 0.0;
 
-  for (i in morse_characters) {
-    if (morse_characters[i].visible)
-      sum = sum + morse_characters[i].level;
+  for (i in cw_chars) {
+    if (cw_chars[i].visible)
+      sum = sum + cw_chars[i].level;
   }
 
   sum = sum * Math.random();
 
-  for (i in morse_characters) {
-    if (morse_characters[i].visible) {
-      sum = sum - morse_characters[i].level;
+  for (i in cw_chars) {
+    if (cw_chars[i].visible) {
+      sum = sum - cw_chars[i].level;
 
       if (sum < 0) 
         return i;
@@ -123,10 +124,10 @@ function graduate() {
   if (error_rate > 0.3)
     return;
   else {
-    for (i in morse_characters) {
-      if (morse_characters[i].visible && morse_characters[i].level > 0.4) return;
-      else if (!morse_characters[i].visible) {
-        morse_characters[i].make_visible();
+    for (i in cw_chars) {
+      if (cw_chars[i].visible && cw_chars[i].level > 0.4) return;
+      else if (!cw_chars[i].visible) {
+        cw_chars[i].make_visible();
         return;
       }
     }
