@@ -20,7 +20,7 @@ $(document).ready(function()  {
  
   $('#press_me>p').text(morse_characters[current_letter_index].character);
 
-  $('body').keydown(function(event) {
+  $('*').keydown(function(event) {
     for (i in morse_characters) {
       if (morse_characters[i].ascii_code == event.which) {
         var passed = morse_characters[current_letter_index].score(event.which);
