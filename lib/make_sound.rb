@@ -14,26 +14,52 @@ SOUND_PATH = File.join(File.dirname(__FILE__), '..', 'public', 'sounds')
 
 class MorseParts
   attr_reader :dit, :dah, :sample_rate
-  def initialize(wpm, frequency, sample_rate)
+  def initialize(wpm, frequency, sample_rate, attack=nil)
     @dit_time = 1.2/wpm
     @frequency = frequency
     @sample_rate = sample_rate
+    @attack = attack
+    @envelope = build_envelope(attack)
 
-    @dit = oscillate(@dit_time) + silence(@dit_time)
-    @dah = oscillate(3*@dit_time) + silence(@dit_time)
+    @dit = scale(apply_envelope(oscillate(@dit_time))) + silence(@dit_time)
+    @dah = scale(apply_envelope(oscillate(3*@dit_time))) + silence(@dit_time)
   end
 
-  # Returns a sample of amplitude values between 0 and 255 along a sine wave
-  # (128 is effectively 0 for a wav file)
+  # Edge-sanding array with n samples in attack
+  def build_envelope(n)
+    (0..n).map { |i| (1 - Math.cos(i*Math::PI/n))/2 }
+  end
+
+  # Apply an enevelope to a set of samples
+  def apply_envelope(samples)
+    unscaled = samples.length - 2*@envelope.length
+    raise "Must have more samples" unless unscaled >= 0
+
+    # full padded envelope
+    full_envelope = @envelope + Array.new(unscaled, 1) + @envelope.reverse
+
+    # merge envelope with samples
+    merged = []
+    full_envelope.each_with_index { |v, i| merged << v*samples[i] }
+    merged 
+  end
+
+  # Scale waveform samples from 0..255
+  def scale(samples)
+    samples.map { |s| (s*127).round + 128 }
+  end
+
+  # Returns a sample of amplitude values between -1 and 1 along a sine wave
   def oscillate(time)
-    (1..sample_times(time)).inject([]) do |samples, n|
+    number_of_samples = sample_times(time)
+    (1..number_of_samples).inject([]) do |samples, n|
       t = 1.0*n/@sample_rate
       omega = 2*Math::PI*@frequency
-      samples << ((1 + Math.sin(omega*t))*127).floor + 1
+      samples << Math.sin(omega*t)
     end
   end
-
-  # Returns a block of rest time for the specified time length 
+  
+  # Returns a block of rest time for the specified time length (already scaled)
   def silence(time)
     samples = []
     sample_times(time).times { samples << 128 } 
@@ -77,7 +103,7 @@ def generate_wav(letter, m)
 end
 
 # Set up sampling
-m = MorseParts.new(20, 1000, 8000)
+m = MorseParts.new(20, 800, 2000, 20)
 
 # Write wav files for all the characters
 LETTERS.each do |k, v|
