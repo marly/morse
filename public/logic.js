@@ -32,6 +32,7 @@ function play_letters(letter_list, letter_index, max_time, context, errors) {
 
   var replay_letter = function() {
     letter.score(false);
+    show_letter(letter, false);
     play_letter();
   }
 
@@ -63,9 +64,11 @@ function play_letters(letter_list, letter_index, max_time, context, errors) {
 
     }
 
-    if (letter.ascii_code == e.which && elapsed < max_time)
+    if (letter.ascii_code == e.which && elapsed < max_time) {
+      show_letter(letter, true);
       new_letter();
       /* TODO: Recaulculate max_time based on previous response */
+    }
   });
 
 }
@@ -75,6 +78,14 @@ function make_audio(letter) {
   $('audio').remove();
   var a = '<audio src="' +  letter.wav + '" autoplay="true"></audio>';
   $('body').append(a);
+}
+
+/* Print last letter played */
+function show_letter(letter, correct) {
+  css_class = (correct ? "correct" : "incorrect");
+  $('#press_me>p').remove();
+  var l = '<p class="' + css_class + '">' + letter.character + '</p>';
+  $('#press_me').append(l);
 }
 
 /* Choose a letter weighted by knowledge of letter */
