@@ -3,9 +3,10 @@ var r;
 var elapsed;
 
 /* Play characters */
-function play_letters(letter_list, letter_index, max_time, context, errors) {
+function play_letters(letter_list, letter_index, mt, context, errors) {
   var letter = letter_list[letter_index];
   var paused = false;
+  var max_time = mt;
   elapsed = 0;
   make_audio(letter);
 
@@ -26,8 +27,8 @@ function play_letters(letter_list, letter_index, max_time, context, errors) {
 
   var play_letter = function() {
     redraw_graph(letter_list, context);
-    elapsed = 0;
     make_audio(letter);
+    elapsed = 0;
   }
 
   var replay_letter = function() {
@@ -42,11 +43,11 @@ function play_letters(letter_list, letter_index, max_time, context, errors) {
     graduate();
     letter = letter_list[choose_letter(letter_list)];
     play_letter();
-    r = window.setInterval(replay_letter, max_time);
+    r = window.setInterval(replay_letter, max_time + offset(letter.character));
   }
 
-  t = window.setTimeout(increment_elapsed, 1);
-  r = window.setInterval(replay_letter, max_time);
+  t = window.setInterval(increment_elapsed, 1);
+  r = window.setInterval(replay_letter, max_time + offset(letter.character));
 
   $('html').keydown(function(e) {
 
@@ -54,17 +55,18 @@ function play_letters(letter_list, letter_index, max_time, context, errors) {
     if (e.which == 32) {
       if (paused) {
         paused = false;
-        t = window.setTimeout(increment_elapsed(), 1);
-        r = window.setInterval(replay_letter, max_time);
+        t = window.setInterval(increment_elapsed, 1);
+        r = window.setInterval(replay_letter, max_time + offset(letter.character));
       } else {
         paused = true;
-        window.clearTimeout(t);
+        window.clearInterval(t);
         window.clearInterval(r);
       }
 
     }
 
-    if (letter.ascii_code == e.which && elapsed < max_time) {
+    if (letter.ascii_code == e.which && elapsed < max_time + offset(letter.character)) {
+      max_time = new_wait_time(max_time, elapsed);
       show_letter(letter, true);
       new_letter();
       /* TODO: Recaulculate max_time based on previous response */
@@ -88,6 +90,12 @@ function show_letter(letter, correct) {
   $('#press_me').append(l);
 }
 
+/* Calculate a new timeout based on the previous time required to answer. */
+function new_wait_time(last_max, time_used) {
+  var new_max = 0.875*last_max + 0.25*(time_used);
+  return ( new_max > 6000 ? 6000 : new_max);
+}
+
 /* Choose a letter weighted by knowledge of letter */
 function choose_letter(letter_list) {
   var sum = 0.0;
@@ -108,5 +116,45 @@ function choose_letter(letter_list) {
      }
    
   }
+}
+
+/* Return ms offset for this character */
+function offset(letter) {
+  /* dit time is 60 ms + 60 ms silence  = 120 ms (at 20 WPM) */
+  /* dah time is 180 ms + 60 ms silence = 240 ms (at 20 WPM) */
+  switch(letter) {
+    /* 1 dot */
+    case 'E': return 120;
+
+    /* 1 dash, 2 dots */
+    case 'T': case 'I': return 240;
+
+    /* 1 dot 1 dash, 3 dots */
+    case 'A': case 'N': case 'S': return 360;
+    
+    /* 2 dashes, 2 dots 1 dash, 4 dots */
+    case 'M': case 'D': case 'R': case 'U': case 'H': return 480;
+
+    /* 2 dashes 1 dot, 3 dots 1 dash, 5 dots */
+    case 'G': case 'K': case 'W': case 'B': case 'L': case 'V': case 'F': case '5':
+      return 600;
+
+    /* 3 dashes, 2 dots 2 dashes, 4 dots 1 dash */
+    case 'O': case 'C': case 'P': case 'X': case 'Z': case '4': case '6':
+      return 720;
+
+    /* 3 dashes 1 dot, 2 dashes 3 dots */
+    case 'J': case 'Q': case 'Y': case '3': case '7': return 840;
+
+    /* 3 dashes 2 dots */
+    case '2': case '8': return 960;
+
+    /* 4 dashes 1 dot */
+    case '1': case '9': return 1080;
+
+    /* 5 dashes */
+    default: return 1200;
+  }
+
 }
 
