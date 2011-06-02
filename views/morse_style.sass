@@ -1,19 +1,99 @@
+$light-olive: #9da377
+$dark-olive: #272a0d
+$green-olive: #676f23
+$taupe: #b6a972
+$meadows: #89ab88
+$bg-taupe: #f1ead0
+$whipcream: #f2e3aa
+$outcast-grey: #e1e1e1
+
+*
+  :margin 0
+
+html, body 
+  :height 100%
+
 body
-  :font-family 'Amaranth', Helvetica, Arial, sans-serif
+  :font-family 'Holtwood One SC', Helvetica, Arial, sans-serif
+  :background-color $bg-taupe
+  :color $dark-olive
+
+#labelling
+  :width 760px
+  :text-align right
+
+#graph
+  :margin-top 20px
+  :margin-left 20px
+
+#footer, .push
+  :height 80px
+
+#footer
+  :background-color $light-olive
+  :text-align center
+
+#footer>ul
+  :padding-top 35px
+#footer>ul>li 
+  :display inline
+  :padding-right 40px
+
+h1
+  :font-size 48px
+  :margin 20px 0 0 30px
+
+h2
+  :font-size 48px
+  :color $meadows
+  :margin 20px 0 
+
+h3
+  :font-size 36px
+  :color $light-olive
+  :margin 10px 0 
+
+h2,h3
+  :font-family 'Pacifico', Helvetica, Arial, sans-serif
+  :font-weight lighter
+  :line-height 50px
+
+a
+  :color $dark-olive
+  :text-decoration none
+
+a:hover
+  :color darken($bg-taupe, 20%)
+
+#wrapper 
+  :min-height 100%
+  :height auto !important
+  :height 100%
+  :margin 0 auto -80px
 
 #press_me
-  :margin-left 5px
+  :margin-left 190px
+  :height 317px
+  :width 620px
+  :background url('key.gif')
+  :position relative
 
-p.correct
-  :background-color #a8d8a8
+.correct
+  :background #a8d8a8
+  :opacity 0.8
 
-p.incorrect
-  :background-color #f07860
+.incorrect
+  :background #f07860
+  :opacity 0.8
 
-#press_me>p
-  :width 100px
+#letter
+  :position absolute
+  :left 510px
+  :top 133px
+  :width 98px
   :font-size 40px
-  :line-height 100px
-  :-moz-border-radius 15px
-  :border-radius 15px
+  :line-height 86px
+  :border-radius 45px 75px 45px 75px
+  :-moz-border-radius 45px 75px 45px 75px
   :text-align center
+  :color $dark-olive

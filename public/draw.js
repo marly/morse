@@ -1,19 +1,20 @@
-var grey_blue = "#4878A8";
-var sky_blue = "#A8D8F0";
-var orange = "#F07830";
-var rouge = "#781800";
-var grey_teal = "#487890";
-var colors = [grey_blue, sky_blue, orange, rouge];
+var outcast = "#e1e1e1";
+var meadows = "#89ab88";
+var taupe = "#b6a972";
+var green_olive = "#676f23";
+
+var colors = [green_olive, meadows, taupe];
 
 /* Redraw the graph to show all visible characters */
 function redraw_graph(characters, context) {
-  context.clearRect(0, 0, 800, 350);   /* empty the graph */
+  context.clearRect(0, 0, 720, 200);   /* empty the graph */
   for (i in characters) {
-    context.fillStyle = colors[i%4];
     if (characters[i].visible) {
-      draw_bar(context, characters[i].level, i);
-      label_bar(context, characters[i].character, i);
+      context.fillStyle = colors[i%3];
     }
+    else { context.fillStyle = outcast; }
+    draw_bar(context, characters[i].level, i);
+    label_bar(context, characters[i].character, i);
   }
 }
 
@@ -21,12 +22,12 @@ function redraw_graph(characters, context) {
 function label_bar(context, character, place) {
   context.font = "bold 18px sans-serif";
   context.textBaseline = 'top';
-  context.fillText(character, 28*place+22, 305);
+  context.fillText(character, 28*place+22, 182);
 }
 
 /* Draw a bar in the bargraph, height based on score */
 function draw_bar(context, score, place) {
-  var height = score*300;
-  var ybase = 300 - score*300;
+  var height = score*180;
+  var ybase = 180 - score*180;
   context.fillRect(28*place + 20, ybase, 18, height);
 }

@@ -1,14 +1,25 @@
 !!!
 %head
   %title Morse
-  %link(href="http://fonts.googleapis.com/css?family=Amaranth" rel="stylesheet" type="text/css")
+  %link(href="http://fonts.googleapis.com/css?family=Holtwood+One+SC" rel="stylesheet" type="text/css")
+  %link(href="http://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet" type="text/css")
+  %link(rel="stylesheet" type="text/css" href="/reset.css")
   %link(rel="stylesheet" type="text/css" href="/morse_style.css")
   %script(rel="text/javascript" src="/jquery.js" )
   %script(rel="text/javascript" src="/draw.js" )
   %script(rel="text/javascript" src="/events.js" )
   %script(rel="text/javascript" src="/logic.js" )
 %body
-  %h1 Learn You A Morse
-  %p Type the character you hear. Press spacebar to pause.
-  =yield
+  #wrapper
+    %h1 Learn Morse Code
+    =yield
+    %div{:class=>"push"}
+  #footer
+    %ul
+      %li 
+        %a{:title=>"About", :href => "#"} About
+      %li
+        %a{:title=>"Credits", :href => "#"} Credits
+      %li 
+        %a{:title=>"Contact", :href => "#"} Contact
 

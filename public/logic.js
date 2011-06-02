@@ -85,8 +85,8 @@ function make_audio(letter) {
 /* Print last letter played */
 function show_letter(letter, correct) {
   css_class = (correct ? "correct" : "incorrect");
-  $('#press_me>p').remove();
-  var l = '<p class="' + css_class + '">' + letter.character + '</p>';
+  $('#letter').remove();
+  var l = '<div id="letter" class="' + css_class + '">' + letter.character + '</div>';
   $('#press_me').append(l);
 }
 
