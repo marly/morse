@@ -6,6 +6,10 @@ module Morse
   class App < Sinatra::Base
     set :public, File.dirname(__FILE__) + '/public'
 
+    get '/reset.css' do
+      sass :reset
+    end
+
     get '/morse_style.css' do
       sass :morse_style
     end
