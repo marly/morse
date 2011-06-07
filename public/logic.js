@@ -1,12 +1,14 @@
 var t;
 var r;
-var elapsed;
+var elapsed;      /* Idle time */
+var was_correct;  /* Did the student guess the character on the first try? */
 
 /* Play characters */
 function play_letters(letter_list, letter_index, mt, context, errors) {
   var letter = letter_list[letter_index];
   var paused = false;
   var max_time = mt;
+  was_correct = true;
   elapsed = 0;
   make_audio(letter);
 
@@ -28,34 +30,35 @@ function play_letters(letter_list, letter_index, mt, context, errors) {
   var play_letter = function() {
     redraw_graph(letter_list, context);
     make_audio(letter);
-    elapsed = 0;
   }
 
   var replay_letter = function() {
-    letter.score(false);
+    was_correct = false;
     show_letter(letter, false);
     play_letter();
+    elapsed = 0;
   }
 
   var new_letter = function() {
     window.clearInterval(r);
-    letter.score(true);
     graduate();
     letter = letter_list[choose_letter(letter_list)];
     play_letter();
     r = window.setInterval(replay_letter, max_time + offset(letter.character));
+    elapsed = 0;
   }
 
-  t = window.setInterval(increment_elapsed, 1);
+  t = window.setInterval(increment_elapsed, 10); /* flakey at 1 ms */
   r = window.setInterval(replay_letter, max_time + offset(letter.character));
 
   $('html').keydown(function(e) {
 
-    /* Handle pausing/resuming */
+    /* Handle pausing/resuming, toggle on spacebar press */
     if (e.which == 32) {
       if (paused) {
         paused = false;
-        t = window.setInterval(increment_elapsed, 1);
+        play_letter();
+        t = window.setInterval(increment_elapsed, 10);
         r = window.setInterval(replay_letter, max_time + offset(letter.character));
       } else {
         paused = true;
@@ -65,8 +68,20 @@ function play_letters(letter_list, letter_index, mt, context, errors) {
 
     }
 
-    if (letter.ascii_code == e.which && elapsed < max_time + offset(letter.character)) {
-      max_time = new_wait_time(max_time, elapsed);
+    /* Handle character scoring */
+    /* If correct character pressed after the entire thing was heard and before
+     * the max_time
+     */
+    if (letter.ascii_code == e.which &&
+        10*elapsed < max_time + offset(letter.character) &&
+        10*elapsed - offset(letter.character) > 0) {   
+      if (was_correct) {
+        letter.score(true);             
+        max_time = new_wait_time(max_time, 10*elapsed);
+      } else {
+        letter.score(false);
+        was_correct = true;                 /* Correct this time, reset */
+      }
       show_letter(letter, true);
       new_letter();
       /* TODO: Recaulculate max_time based on previous response */
