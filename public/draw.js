@@ -7,7 +7,7 @@ var colors = [green_olive, meadows, taupe];
 
 /* Redraw the graph to show all visible characters */
 function redraw_graph(characters, context) {
-  context.clearRect(0, 0, 720, 200);   /* empty the graph */
+  context.clearRect(0, 0, 690, 150);   /* empty the graph */
   for (i in characters) {
     if (characters[i].visible) {
       context.fillStyle = colors[i%3];
@@ -20,14 +20,14 @@ function redraw_graph(characters, context) {
 
 /* Label a bar of the bargraph with the correct character */
 function label_bar(context, character, place) {
-  context.font = "bold 18px sans-serif";
+  context.font = "bold 14px sans-serif";
   context.textBaseline = 'top';
-  context.fillText(character, 28*place+22, 182);
+  context.fillText(character, 18*place+22, 137);
 }
 
 /* Draw a bar in the bargraph, height based on score */
 function draw_bar(context, score, place) {
-  var height = score*180;
-  var ybase = 180 - score*180;
-  context.fillRect(28*place + 20, ybase, 18, height);
+  var height = score*135;
+  var ybase = 135 - score*135;
+  context.fillRect(18*place + 20, ybase, 14, height);
 }
