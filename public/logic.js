@@ -6,11 +6,10 @@ var was_correct;  /* Did the student guess the character on the first try? */
 /* Play characters */
 function play_letters(letter_list, letter_index, mt, context, errors) {
   var letter = letter_list[letter_index];
-  var paused = false;
+  var paused = true;
   var max_time = mt;
   was_correct = true;
   elapsed = 0;
-  make_audio(letter);
 
   var graduate = function() {
     if (errors > 0.3)
@@ -48,20 +47,19 @@ function play_letters(letter_list, letter_index, mt, context, errors) {
     elapsed = 0;
   }
 
-  t = window.setInterval(increment_elapsed, 10); /* flakey at 1 ms */
-  r = window.setInterval(replay_letter, max_time + offset(letter.character));
-
   $('html').keydown(function(e) {
 
     /* Handle pausing/resuming, toggle on spacebar press */
     if (e.which == 32) {
       if (paused) {
         paused = false;
+        update_pause('pause');
         play_letter();
         t = window.setInterval(increment_elapsed, 10);
         r = window.setInterval(replay_letter, max_time + offset(letter.character));
       } else {
         paused = true;
+        update_pause('resume');
         window.clearInterval(t);
         window.clearInterval(r);
       }
@@ -88,6 +86,13 @@ function play_letters(letter_list, letter_index, mt, context, errors) {
     }
   });
 
+}
+
+/* Update pausing information */
+function update_pause(pause_action) {
+  var p = '<h3>Press spacebar to ' + pause_action + '.</h3>';
+  $('h3').remove();
+  $('#labelling').append(p);
 }
 
 /* Make audio */
