@@ -28,6 +28,7 @@ body
 
 #footer, .push
   :height 60px
+  :clear both
 
 #footer
   :background-color $light-olive
@@ -58,6 +59,7 @@ h2,h3
   :font-family 'Pacifico', Helvetica, Arial, sans-serif
   :font-weight lighter
   :line-height 50px
+  :clear both
 
 a
   :color $dark-olive
@@ -99,10 +101,24 @@ a:hover
   :text-align center
   :color $dark-olive
 
-#information
-  :font-size 18px
+.information
+  :font-size 16px
   :line-height 24px
-  :width 400px
+  :width 300px
   :float right
   :text-align left
   :font-family Helvetica, Arial, sans-serif
+  :margin 10px 0 20px 0
+
+.information>p
+  :margin-bottom 15px
+
+.information>p>a
+  :color lighten($dark-olive, 20%)
+
+.information>p>a:hover
+  :color darken($bg-taupe, 20%)
+
+.morse1840
+  :background url('morse_1840.png') no-repeat 60px 20px
+  :height 100%

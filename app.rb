@@ -17,6 +17,10 @@ module Morse
     get '/morse' do
       haml :morse, {:layout => :morse_layout}
     end
+
+    get '/about' do
+      haml :about, {:layout => :morse_layout}
+    end
   end
 end
 
