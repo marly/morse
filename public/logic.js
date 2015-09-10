@@ -96,10 +96,18 @@ function update_pause(pause_action) {
 }
 
 /* Make audio */
+// Caveat: Changing the src and player.load()/player.play() leads to playback
+//         issues in Chrome, so we do the stupid thing and recreate the player
+//         each time.
 function make_audio(letter) {
-  $('audio').remove();
-  var a = '<audio src="' +  letter.wav + '" autoplay="true"></audio>';
-  $('body').append(a);
+  var player = document.getElementById('morse-player');
+  if (player) 
+    player.parentNode.removeChild(player);
+
+  fragment = '<audio src="' + letter.wav + '" id="morse-player" type="audio/wav"></audio>';
+  document.body.insertAdjacentHTML('beforeend', fragment);
+  player = document.getElementById('morse-player');
+  player.play();
 }
 
 /* Print last letter played */

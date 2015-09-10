@@ -103,7 +103,9 @@ def generate_wav(letter, m)
 end
 
 # Set up sampling
-m = MorseParts.new(20, 800, 8800, 20)
+wpm = (ARGV[0] && ARGV[0].to_i) || 20
+
+m = MorseParts.new(wpm, 800, 8800, 20)
 
 # Write wav files for all the characters
 LETTERS.each do |k, v|
